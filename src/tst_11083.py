@@ -1,17 +1,75 @@
 # coding: UTF-8
 
+import unittest
 
-##!!!!##################################################################################################
-#### Own written code can be placed above this commentblock . Do not change or delete commentblock! ####
-########################################################################################################
-##** Code created by generator - DO NOT CHANGE! **##
+
+class hsl20_3:
+    LOGGING_NONE = 0
+
+    def __init__(self):
+        pass
+
+    class BaseModule:
+
+        def __init__(self, a, b):
+            pass
+
+        def _get_framework(self):
+            f = hsl20_3.Framework()
+            return f
+
+        def _get_logger(self, a, b):
+            return 0
+
+        def _get_remanent(self, key):
+            return 0
+
+        def _set_remanent(self, key, val):
+            pass
+
+        def _set_output_value(self, pin, value):
+            print("### Out \tPin " + str(pin) + ", Value: " + str(value))
+            return ("### Out \tPin " + str(pin) + ", Value: " + str(value))
+
+        def _get_input_value(self, pin):
+            if pin == 5:
+                return 1
+            else:
+                return 0
+
+    class Framework:
+        def __init__(self):
+            pass
+
+        def _run_in_context_thread(self, a):
+            pass
+
+        def create_debug_section(self):
+            d = hsl20_3.DebugHelper()
+            return d
+
+        def get_homeserver_private_ip(self):
+            return "192.168.143.30"
+
+    class DebugHelper():
+        def __init__(self):
+            pass
+
+        def set_value(self, p_sCap, p_sText):
+            print ("DEBUG value\t" + str(p_sCap) + ": " + str(p_sText))
+
+        def add_message(self, p_sMsg):
+            print ("Debug Msg\t" + str(p_sMsg))
+
+################################################
+################################################
 
 class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 
     def __init__(self, homeserver_context):
         hsl20_3.BaseModule.__init__(self, homeserver_context, "hsl20_3_Powermeter")
         self.FRAMEWORK = self._get_framework()
-        self.LOGGER = self._get_logger(hsl20_3.LOGGING_NONE,())
+        self.LOGGER = self._get_logger(hsl20_3.LOGGING_NONE, ())
         self.PIN_I_IC=1
         self.PIN_I_RESET1=2
         self.PIN_I_RESET2=3
@@ -147,3 +205,43 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
             self._set_remanent(self.REM_TS1_CONS_PREV, 0)
             self._set_remanent(self.REM_TS2_CONS_PREV, 0)
             self._set_remanent(self.REM_TS3_CONS_PREV, 0)
+
+################################################
+################################################
+
+
+class TestSequenceFunctions(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def test_process_counter(self):
+        tst = Leistungsmesser_11083_11083(0)
+        tst.on_init()
+        self.assertEqual(tst.gc, 0)
+        self.assertEqual(tst.ic_prev, 0)
+
+        tst.on_input_value(tst.PIN_I_IC, 10)
+        self.assertEqual(tst.gc, 10)
+        self.assertEqual(tst.ic_prev, 10)
+
+        tst.on_input_value(tst.PIN_I_IC, 5)
+        self.assertEqual(tst.gc, 15)
+        self.assertEqual(tst.ic_prev, 5)
+
+    def test_process_int_reset(self):
+        tst = Leistungsmesser_11083_11083(0)
+        tst.on_init()
+        tst.gc = 100
+        tst.gc_sts[0] = 10
+        tst.gc_sts[1] = 20
+        tst.gc_sts[2] = 30
+        self.assertEqual(tst.gc_sts[2], 30)
+        tst.process_int_reset(0)
+        self.assertEqual(tst.gc_sts[0], 100)
+        self.assertEqual(tst.gc_sts[1], 20)
+        self.assertEqual(tst.gc_sts[2], 30)
+
+
+if __name__ == '__main__':
+    unittest.main()

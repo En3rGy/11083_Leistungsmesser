@@ -115,7 +115,6 @@ Code and releases are availabe via [github](https://github.com/En3rGy/14108_tibb
 | `ic` | Input counter value |
 | `ic_curr` | Current input counter value received, respecting gain and offset. |
 | `ic_prev` | Last input counter value received, respecting gain and offset. |
-| `ts1_lc` | Local counter containing the consumption of the current time span 1. |
 | `gc` | Global counter containing the counter value (incl. gain & offset) since the last reset. |
 | `ts1_gc_sts` | Global value of counter at the beginning of the *current* time span 1 *and* at the end of the *previous* time span 1. |
 | `ts1_cons_curr` | Consumption of the current time span 1, increasing with new ic. |
@@ -130,14 +129,8 @@ Calculations are based on an global counter. This counte is first initialised by
 | --- | --- |
 | Input counter respecting input counter (ic) gain (k) and offset (o) | `ic_curr = k * ic - o` |
 | Receive new ic_curr value and deal with ic buffer overrun | `ic_prev > ic_curr ? gc += ic_curr : gc += ic_curr - ic_prev` <br> `ic_prev = ic_curr` |
-| Local counter during for the on-going time span 1 | `ts1_lc = gc - ts1_gc_sts` |
-| Receive end / start interval trigger | `ts1_cons_prev = gc - ts1_gc_sts`< br> `ts1_gc_sts = gc` <br> `ts1_cons_curr = 0`|
-
-### Retentive storage
-
-- `gc`
-- `ts1_gc_sts`
-- `ic_prev`
+| Local counter during for the on-going time span 1 | `ts1_cons_curr = gc - ts1_gc_sts` |
+| Receive end / start interval trigger | `ts1_cons_prev = gc - ts1_gc_sts` <br> `ts1_gc_sts = gc` <br> `ts1_cons_curr = 0`|
 
 
 ## Licence
