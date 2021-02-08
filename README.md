@@ -29,6 +29,10 @@
 | `ts1_cons_curr` | Consumption of the current time span 1, increasing with new ic. |
 | `ts1_cons_pev` | Total consuption during the previous time span 1. |
 
+### Solution Outline
+
+Calculations are based on an global counter. This counte is first initialised by the first in value recived. The global counter is increased by the delta of two ic values recieved. To caluclate the consuption during a time span, the value of the global counter at the beginning of the time span is stored. This vlaue equals the value of the gloabl counter at the end of the previous time span. Consumptions are caluclated by substracting the global counter values stored.
+
 ### Calculations
 | Description | Formula |
 | --- | --- |
