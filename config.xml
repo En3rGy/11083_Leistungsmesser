@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <modules>
+        <module category="Zähler" context="hsl20_3_Powermeter" id="11083" name="Leistungsmesser (11083)" version="0.01">
+            <inputs>
+				<input type="number" const_name="nCounter" init_value="0">1 Counter</input>
+				<input type="number" const_name="nReset1" init_value="0">2 Reset 1</input>
+				<input type="number" const_name="nReset2" init_value="0">3 Reset 2</input>
+				<input type="number" const_name="nReset3" init_value="0">4 Reset 3</input>				
+				<input type="number" const_name="nGain" init_value="0">5 Gain</input>
+				<input type="number" const_name="nReset" init_value="0">6 Reset</input>
+				<input type="number" const_name="nOffset" init_value="0">7 Offset</input>		
+            </inputs>
+            <outputs>
+				<output type="number" const_name="nTotal" init_value="0">1 Counter total</output>
+				<output type="number" const_name="nInt1Curr" init_value="0">2 current 1</output>
+				<output type="number" const_name="nInt1Prev" init_value="0">3 previous 1</output>
+				<output type="number" const_name="nInt2Curr" init_value="0">4 current 2</output>
+				<output type="number" const_name="nInt2Prev" init_value="0">5 previous 2</output>
+				<output type="number" const_name="nInt3Curr" init_value="0">6 current 3</output>
+				<output type="number" const_name="nInt3Prev" init_value="0">7 previous 3</output>				
+            </outputs>
+			<remanent_variables>
+                <remanent_variable const_name="int1curr">int1curr</remanent_variable>
+                <remanent_variable const_name="int1past">int1past</remanent_variable>
+                <remanent_variable const_name="int2curr">int2curr</remanent_variable>
+                <remanent_variable const_name="int2past">int2past</remanent_variable>
+                <remanent_variable const_name="int3curr">int3curr</remanent_variable>
+                <remanent_variable const_name="int3past">int3past</remanent_variable>
+				<remanent_variable const_name="last_cnt_val">last_cnt_val</remanent_variable>
+				<remanent_variable const_name="counter">counter</remanent_variable>				
+            </remanent_variables>
+            <imports>
+            </imports>		
+        </module>	
+    </modules>
+</config>
