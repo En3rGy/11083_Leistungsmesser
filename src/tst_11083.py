@@ -72,30 +72,30 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
     def __init__(self, homeserver_context):
         hsl20_3.BaseModule.__init__(self, homeserver_context, "hsl20_3_Powermeter")
         self.FRAMEWORK = self._get_framework()
-        self.LOGGER = self._get_logger(hsl20_3.LOGGING_NONE, ())
-        self.PIN_I_IC = 1
-        self.PIN_I_RESET1 = 2
-        self.PIN_I_RESET2 = 3
-        self.PIN_I_RESET3 = 4
-        self.PIN_I_GAIN = 5
-        self.PIN_I_RESET = 6
-        self.PIN_I_OFFSET = 7
-        self.PIN_O_GC = 1
-        self.PIN_O_TS1_CONS_CURR = 2
-        self.PIN_O_TS1_CONS_PEV = 3
-        self.PIN_O_TS2_CONS_CURR = 4
-        self.PIN_O_TS2_CONS_PEV = 5
-        self.PIN_O_TS3_CONS_CURR = 6
-        self.PIN_O_TS3_CONS_PEV = 7
-        self.REM_GC = 1
-        self.REM_TS1_GC_STS = 2
-        self.REM_TS2_GC_STS = 3
-        self.REM_TS3_GC_STS = 4
-        self.REM_IC_PREV = 5
-        self.REM_TS1_CONS_PREV = 6
-        self.REM_TS2_CONS_PREV = 7
-        self.REM_TS3_CONS_PREV = 8
-        self.REM_LAST_CNT_VAL = 9
+        self.LOGGER = self._get_logger(hsl20_3.LOGGING_NONE,())
+        self.PIN_I_IC=1
+        self.PIN_I_RESET1=2
+        self.PIN_I_RESET2=3
+        self.PIN_I_RESET3=4
+        self.PIN_I_GAIN=5
+        self.PIN_I_RESET=6
+        self.PIN_I_OFFSET=7
+        self.PIN_O_TS1_CONS_CURR=1
+        self.PIN_O_TS1_CONS_PEV=2
+        self.PIN_O_TS2_CONS_CURR=3
+        self.PIN_O_TS2_CONS_PEV=4
+        self.PIN_O_TS3_CONS_CURR=5
+        self.PIN_O_TS3_CONS_PEV=6
+        self.PIN_O_GC=7
+        self.REM_GC=1
+        self.REM_TS1_GC_STS=2
+        self.REM_TS2_GC_STS=3
+        self.REM_TS3_GC_STS=4
+        self.REM_IC_PREV=5
+        self.REM_TS1_CONS_PREV=6
+        self.REM_TS2_CONS_PREV=7
+        self.REM_TS3_CONS_PREV=8
+        self.REM_LAST_CNT_VAL=9
         self.FRAMEWORK._run_in_context_thread(self.on_init)
 
     ########################################################################################################

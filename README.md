@@ -26,13 +26,13 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
 | No. | Name | Initialisation | Description |
 | --- | --- | --- | --- |
-| 1 | Counter total | 0 | Totcal continious counter |
-| 2 | Current 1 | 0 | Consumption within current interval 1 |
-| 3 | Previous 1 | 0 | Consumption during previous interval 1 |
-| 4 | Current 2 | 0 | Consumption within current interval 2 |
-| 5 | Previous 2 | 0 | Consumption during previous interval 2 |
-| 6 | Current 3 | 0 | Consumption within current interval 3 |
-| 7 | Previous 3 | 0 | Consumption during previous interval 3 |
+| 1 | Current 1 | 0 | Consumption within current interval 1 |
+| 2 | Previous 1 | 0 | Consumption during previous interval 1 |
+| 3 | Current 2 | 0 | Consumption within current interval 2 |
+| 4 | Previous 2 | 0 | Consumption during previous interval 2 |
+| 5 | Current 3 | 0 | Consumption within current interval 3 |
+| 6 | Previous 3 | 0 | Consumption during previous interval 3 |
+| 7 | Counter total | 0 | Totcal continious counter |
 
 ## Sample Values
 
