@@ -14,7 +14,7 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
 | No. | Name | Initialisation | Description |
 | --- | --- | --- | --- |
-| 1 | Counter | 0 | Current counter value |
+| 1 | Counter | 0 | Current counter value, either increasing or as puls. <br> If given as pulse, gain is used to define the step size. A puls signal has to be equal to 1! |
 | 2 | Reset 1 | 0 | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous. |
 | 3 | Reset 2 | 0 | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous. |
 | 4 | Reset 3 | 0 | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous. |
@@ -26,13 +26,13 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
 | No. | Name | Initialisation | Description |
 | --- | --- | --- | --- |
-| 1 | Counter total | 0 | |
-| 2 | Current 1 | 0 | |
-| 3 | Previous 1 | 0 | |
-| 4 | Current 2 | 0 | |
-| 5 | Previous 2 | 0 | |
-| 6 | Current 3 | 0 | |
-| 7 | Previous 3 | 0 | |
+| 1 | Counter total | 0 | Totcal continious counter |
+| 2 | Current 1 | 0 | Consumption within current interval 1 |
+| 3 | Previous 1 | 0 | Consumption during previous interval 1 |
+| 4 | Current 2 | 0 | Consumption within current interval 2 |
+| 5 | Previous 2 | 0 | Consumption during previous interval 2 |
+| 6 | Current 3 | 0 | Consumption within current interval 3 |
+| 7 | Previous 3 | 0 | Consumption during previous interval 3 |
 
 ## Sample Values
 
@@ -55,20 +55,7 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
  - v0.8
      - Refactoring to HSL2
- - v0.7
-     - Various improvements
- - v0.6
-     - Solved bug reporting last years data
- - v0.5
-     - Additional SN to save current counter
- - v0.4
-     - Removed ==1 
-     - Used SA instead of SN
- - v0.3
-     - Improved comments
-     - Replaced <>0 by ==1
- - v0.2
-     - Initial
+
 
 ### Open Issues / Know Bugs
 
@@ -93,16 +80,16 @@ Code and releases are availabe via [github](https://github.com/En3rGy/14108_tibb
 
 
 ## Requirements
-- The module shall output the consumptions since the beginning for all current time spans.
-- The module shall output the total consumptions of the previous time spans.
-- The module shall use an increasing counter as input for calculating the consumptions.
-- The module should use a pulse signal input for calculating the consumptions.
-- The start / end of a time span shall be indicated by a 1 on a dedicated input.
-- The module shall accept a gain input to be multiplied with the counter input value.
-- The module shall accept an offset input value to be substracted from the gained counter input value.
-- The module shall accept a "reset" input, setting all outputs and internal values to 0.
-- The module shall output the global counter repsecting gain and offset since the last reset.
-- The module shall deal with an overflow of the input counter by 
+1. The module shall output the consumptions since the beginning for all current time spans.
+2. The module shall output the total consumptions of the previous time spans.
+3. The module shall use an increasing counter as input for calculating the consumptions.
+4. The module should use a pulse signal input for calculating the consumptions.
+5. The start / end of a time span shall be indicated by a 1 on a dedicated input.
+6. The module shall accept a gain input to be multiplied with the counter input value.
+7. The module shall accept an offset input value to be substracted from the gained counter input value.
+8. The module shall accept a "reset" input, setting all outputs and internal values to 0.
+9. The module shall output the global counter repsecting gain and offset since the last reset.
+10. The module shall deal with an overflow of the input counter by increasing the global counter.
 
 ## Software Design Description
 
@@ -132,10 +119,12 @@ Calculations are based on an global counter. This counte is first initialised by
 | Local counter during for the on-going time span 1 | `ts1_cons_curr = gc - ts1_gc_sts` |
 | Receive end / start interval trigger | `ts1_cons_prev = gc - ts1_gc_sts` <br> `ts1_gc_sts = gc` <br> `ts1_cons_curr = 0`|
 
+## Validation & Verification
+- Unit tests are performed for each requirement.
 
 ## Licence
 
-Copyright 2015 T. Paul
+Copyright 2021 T. Paul
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

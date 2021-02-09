@@ -41,24 +41,49 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 #### Own written code can be placed after this commentblock . Do not change or delete commentblock! ####
 ###################################################################################################!!!##
 
-    gc_sts = [0] * 3     # global counter at start of time span
+    gc_sts = [0] * 3  # global counter at start of time span
     cons_prev = [0] * 3  # consumption of previous time span
-    gc = 0          # global counter
-    ic_prev = 0     # Last input counter value received, respecting gain and offset
+    gc = 0  # global counter
+    ic_prev = 0  # Last input counter value received, respecting gain and offset
+    gain = 1
+    offset = 0
+    precision = 6
 
     def process_counter(self):
         for i in range(3):
-            ts_cons_curr = self.gc - self.gc_sts[i]
-            self._set_output_value(self.PIN_O_TS1_CONS_CURR + i, ts_cons_curr)
+            pin = self.PIN_O_TS1_CONS_CURR
+            if i == 1:
+                pin = self.PIN_O_TS2_CONS_CURR
+            elif i == 2:
+                pin = self.PIN_O_TS3_CONS_CURR
+
+            ts_cons_curr = round(self.gc - self.gc_sts[i], self.precision)
+            self._set_output_value(pin, ts_cons_curr)
 
     def process_int_reset(self, i):
-        self.cons_prev[i] = self.gc - self.gc_sts[i]
-        self.gc_sts[i] = self.gc
-        self._set_output_value(self.PIN_O_TS1_CONS_PEV + i, self.cons_prev[i])
-        self._set_output_value(self.PIN_O_TS1_CONS_CURR + i, 0)
+        pin_prev = self.PIN_O_TS1_CONS_PEV
+        pin_curr = self.PIN_O_TS1_CONS_CURR
+        rem_gc_sts = self.REM_TS1_GC_STS
+        rem_cons_prev = self.REM_TS1_CONS_PREV
 
-        self._set_remanent(self.REM_TS1_GC_STS + i, self.gc_sts[i])
-        self._set_remanent(self.REM_TS1_CONS_PREV + i, self.cons_prev[i])
+        if i == 1:
+            pin_prev = self.PIN_O_TS2_CONS_PEV
+            pin_curr = self.PIN_O_TS2_CONS_CURR
+            rem_gc_sts = self.REM_TS2_GC_STS
+            rem_cons_prev = self.REM_TS2_CONS_PREV
+        elif i == 2:
+            pin_prev = self.PIN_O_TS3_CONS_PEV
+            pin_curr = self.PIN_O_TS3_CONS_CURR
+            rem_gc_sts = self.REM_TS3_GC_STS
+            rem_cons_prev = self.REM_TS3_CONS_PREV
+
+        self.cons_prev[i] = round(self.gc - self.gc_sts[i], self.precision)
+        self.gc_sts[i] = self.gc
+        self._set_output_value(pin_prev, self.cons_prev[i])
+        self._set_output_value(pin_curr, 0)
+
+        self._set_remanent(rem_gc_sts, self.gc_sts[i])
+        self._set_remanent(rem_cons_prev, self.cons_prev[i])
 
     def on_init(self):
         self.DEBUG = self.FRAMEWORK.create_debug_section()
@@ -87,6 +112,9 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
             self.cons_prev[1] = 0
             self.cons_prev[2] = 0
 
+        self.gain = self._get_input_value(self.PIN_I_GAIN)
+        self.offset = self._get_input_value(self.PIN_I_OFFSET)
+
         self.process_counter()
         self.process_int_reset(0)
         self.process_int_reset(1)
@@ -94,22 +122,17 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 
     def on_input_value(self, index, value):
 
-        self.DEBUG.set_value("index", index)
-
         if index == self.PIN_I_IC:
-            self.DEBUG.add_message("found self.PIN_I_IC")
-            gain = self._get_input_value(self.PIN_I_GAIN)
-            offset = self._get_input_value(self.PIN_I_OFFSET)
-
-            ic_curr = (value * gain) - offset
-
-            self.DEBUG.set_value("gain", gain)
-            self.DEBUG.set_value("offset", offset)
-            self.DEBUG.set_value("ic_curr", ic_curr)
+            ic_curr = (value * self.gain) - self.offset
 
             # increase global counter
-            if self.ic_prev > ic_curr:
+            # pulse
+            if value == 1:
                 self.gc += ic_curr
+            # overflow
+            elif self.ic_prev > ic_curr:
+                self.gc += ic_curr
+            # usual counter
             else:
                 self.gc += ic_curr - self.ic_prev
 
@@ -118,27 +141,33 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 
             # store global counter
             self.ic_prev = ic_curr
+            self._set_output_value(self.PIN_O_GC, self.gc)
             self._set_remanent(self.REM_GC, self.gc)
             self._set_remanent(self.REM_IC_PREV, self.ic_prev)
 
-        elif index == self.PIN_I_RESET1:
+        elif index == self.PIN_I_GAIN:
+            self.gain = value
+        elif index == self.PIN_I_OFFSET:
+            self.offset = value
+
+        elif index == self.PIN_I_RESET1 and value != 0:
             self.process_int_reset(0)
 
-        elif index == self.PIN_I_RESET2:
+        elif index == self.PIN_I_RESET2 and value != 0:
             self.process_int_reset(1)
 
-        elif index == self.PIN_I_RESET3:
+        elif index == self.PIN_I_RESET3 and value != 0:
             self.process_int_reset(2)
 
-        elif index == self.PIN_I_RESET:
+        elif index == self.PIN_I_RESET and value != 0:
             self.gc = 0
             self._set_remanent(self.REM_GC, 0)
 
-            self.gc_sts[1] = 0
+            self.gc_sts[0] = 0
             self._set_remanent(self.REM_TS1_GC_STS, 0)
-            self.gc_sts[2] = 0
+            self.gc_sts[1] = 0
             self._set_remanent(self.REM_TS2_GC_STS, 0)
-            self.gc_sts[3] = 0
+            self.gc_sts[2] = 0
             self._set_remanent(self.REM_TS3_GC_STS, 0)
 
             self.ic_prev = 0
