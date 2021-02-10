@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
     <modules>
-        <module category="Zähler" context="hsl20_3_Powermeter" id="11083" name="Leistungsmesser (11083)" version="0.01">
+        <module category="Zähler" context="hsl20_3_Powermeter" id="11083" name="Leistungsmesser (11083)" version="00.08">
             <inputs>
 				<input type="number" const_name="IC" init_value="0">1 Counter</input>
 				<input type="number" const_name="Reset1" init_value="0">2 Reset 1</input>

@@ -3,10 +3,10 @@
 ## Description 
 
 Logic module for Gira Homeserver to record and compare counter values.
-The module records values of a specific counter. If the input counter has an overflow, the module outputs a continious value.
+The module records values of a specific counter. If the input counter has an overflow, the module outputs a continuous value.
 
 The module provides counter values for up to three intervals.
-For each interval, the increase of the counter during the current interval and the increase during the passed intverval, is given.
+For each interval, the increase of the counter during the current interval and the increase during the passed interval, is given.
 
 All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
@@ -32,13 +32,13 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 | 4 | Previous 2 | 0 | Consumption during previous interval 2 |
 | 5 | Current 3 | 0 | Consumption within current interval 3 |
 | 6 | Previous 3 | 0 | Consumption during previous interval 3 |
-| 7 | Counter total | 0 | Totcal continious counter |
+| 7 | Counter total | 0 | Total continuous counter |
 
 ## Sample Values
 
 | Input | Output |
 | --- | --- |
-| On init | All outputs set to the previosuly stored retentive values |
+| On init | All outputs set to the previously stored retentive values |
 | Counter = A | Output `Current x` set to `A - Previous x` with x = 1/2/3 |
 | Counter = B | Output `Current x` set to `B - Previous x` with x = 1/2/3 |
 | Reset 1 = 1 | Output `Previous 1 = Current 1` and afterwards `Current 1 = 0` | 
@@ -69,7 +69,7 @@ Questions can be addressed as new threads at the [knx-user-forum.de](https://knx
 
 ### Code
 
-Code and releases are availabe via [github](https://github.com/En3rGy/14108_tibber). Stable releases will be availabe at the [knx-user-forum.de download section](https://service.knx-user-forum.de/?comm=download) also.
+Code and releases are available via [github](https://github.com/En3rGy/14108_tibber). Stable releases will be available at the [knx-user-forum.de download section](https://service.knx-user-forum.de/?comm=download) also.
 
 ### Devleopment Environment
 
@@ -86,9 +86,9 @@ Code and releases are availabe via [github](https://github.com/En3rGy/14108_tibb
 4. The module should use a pulse signal input for calculating the consumptions.
 5. The start / end of a time span shall be indicated by a 1 on a dedicated input.
 6. The module shall accept a gain input to be multiplied with the counter input value.
-7. The module shall accept an offset input value to be substracted from the gained counter input value.
+7. The module shall accept an offset input value to be subtracted from the gained counter input value.
 8. The module shall accept a "reset" input, setting all outputs and internal values to 0.
-9. The module shall output the global counter repsecting gain and offset since the last reset.
+9. The module shall output the global counter respecting gain and offset since the last reset.
 10. The module shall deal with an overflow of the input counter by increasing the global counter.
 
 ## Software Design Description
@@ -105,11 +105,11 @@ Code and releases are availabe via [github](https://github.com/En3rGy/14108_tibb
 | `gc` | Global counter containing the counter value (incl. gain & offset) since the last reset. |
 | `ts1_gc_sts` | Global value of counter at the beginning of the *current* time span 1 *and* at the end of the *previous* time span 1. |
 | `ts1_cons_curr` | Consumption of the current time span 1, increasing with new ic. |
-| `ts1_cons_pev` | Total consuption during the previous time span 1. |
+| `ts1_cons_pev` | Total consumption during the previous time span 1. |
 
 ### Solution Outline
 
-Calculations are based on an global counter. This counte is first initialised by the first in value recived. The global counter is increased by the delta of two ic values recieved. To caluclate the consuption during a time span, the value of the global counter at the beginning of the time span is stored. This vlaue equals the value of the gloabl counter at the end of the previous time span. Consumptions are caluclated by substracting the global counter values stored.
+Calculations are based on an global counter. This counter is first initialised by the first in value received. The global counter is increased by the delta of two ic values received. To calculate the consumption during a time span, the value of the global counter at the beginning of the time span is stored. This value equals the value of the global counter at the end of the previous time span. Consumptions are calculated by subtracting the global counter values stored.
 
 ### Calculations
 | Description | Formula |
