@@ -48,6 +48,7 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
     gain = 1
     offset = 0
     precision = 6
+    init_run = True
 
     def process_counter(self):
         for i in range(3):
@@ -99,18 +100,18 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
             self.cons_prev[0] = float(self._get_remanent(self.REM_TS1_CONS_PREV))
             self.cons_prev[1] = float(self._get_remanent(self.REM_TS2_CONS_PREV))
             self.cons_prev[2] = float(self._get_remanent(self.REM_TS3_CONS_PREV))
+            self.init_run = False
 
         except:
             self.gc = 0
             self.gc_sts[0] = 0
             self.gc_sts[1] = 0
             self.gc_sts[2] = 0
-
             self.ic_prev = 0
-
             self.cons_prev[0] = 0
             self.cons_prev[1] = 0
             self.cons_prev[2] = 0
+            self.init_run = True
 
         self.gain = self._get_input_value(self.PIN_I_GAIN)
         self.offset = self._get_input_value(self.PIN_I_OFFSET)
@@ -124,6 +125,11 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 
         if index == self.PIN_I_IC:
             ic_curr = (value * self.gain) - self.offset
+
+            if self.init_run:
+                self.ic_prev = ic_curr
+                self.init_run = False
+                return
 
             # increase global counter
             # pulse

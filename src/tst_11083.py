@@ -109,6 +109,7 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
     gain = 1
     offset = 0
     precision = 6
+    init_run = True
 
     def process_counter(self):
         for i in range(3):
@@ -160,18 +161,18 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
             self.cons_prev[0] = float(self._get_remanent(self.REM_TS1_CONS_PREV))
             self.cons_prev[1] = float(self._get_remanent(self.REM_TS2_CONS_PREV))
             self.cons_prev[2] = float(self._get_remanent(self.REM_TS3_CONS_PREV))
+            self.init_run = False
 
         except:
             self.gc = 0
             self.gc_sts[0] = 0
             self.gc_sts[1] = 0
             self.gc_sts[2] = 0
-
             self.ic_prev = 0
-
             self.cons_prev[0] = 0
             self.cons_prev[1] = 0
             self.cons_prev[2] = 0
+            self.init_run = True
 
         self.gain = self._get_input_value(self.PIN_I_GAIN)
         self.offset = self._get_input_value(self.PIN_I_OFFSET)
@@ -185,6 +186,11 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 
         if index == self.PIN_I_IC:
             ic_curr = (value * self.gain) - self.offset
+
+            if self.init_run:
+                self.ic_prev = ic_curr
+                self.init_run = False
+                return
 
             # increase global counter
             # pulse
@@ -251,6 +257,7 @@ class RequirementsVerification(unittest.TestCase):
     def test_req01_cons_curr_timespan(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.on_init()
+        tst.init_run = False
         tst.on_input_value(tst.PIN_I_IC, 10)      # gc 10
         tst.on_input_value(tst.PIN_I_RESET1, 1)   # gc_sts1 = 10
         self.assertEqual(0, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_CURR], "msg=1")
@@ -274,6 +281,7 @@ class RequirementsVerification(unittest.TestCase):
     def test_req02_cons_prev_timespan(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.on_init()
+        tst.init_run = False
         tst.on_input_value(tst.PIN_I_IC, 10)      # gc 10
         tst.on_input_value(tst.PIN_I_RESET1, 1)   # gc_sts1 = 10
         self.assertEqual(10, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_PEV])
@@ -290,6 +298,7 @@ class RequirementsVerification(unittest.TestCase):
     def test_req03_counter_input(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.on_init()
+        tst.init_run = False
         tst.on_input_value(tst.PIN_I_IC, 10)      # gc 10
         tst.on_input_value(tst.PIN_I_IC, 20)      # gc 20
         tst.on_input_value(tst.PIN_I_IC, 30.1)    # gc 30.1
@@ -300,6 +309,7 @@ class RequirementsVerification(unittest.TestCase):
     def test_req04_pulse_input(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.on_init()
+        tst.init_run = False
         tst.on_input_value(tst.PIN_I_GAIN, 10)
         tst.on_input_value(tst.PIN_I_IC, 1)
         tst.on_input_value(tst.PIN_I_IC, 1)
@@ -311,6 +321,7 @@ class RequirementsVerification(unittest.TestCase):
     def test_req05_start_timespan(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.on_init()
+        tst.init_run = False
         tst.on_input_value(tst.PIN_I_IC, 10)
         self.assertEqual(10, tst.gc)
         self.assertEqual(0, tst.gc_sts[0])
@@ -336,13 +347,15 @@ class RequirementsVerification(unittest.TestCase):
     def test_req06_gain_input(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.on_init()
+        tst.init_run = False
         gain = 4
         tst.on_input_value(tst.PIN_I_GAIN, gain)
-        self.assertEqual(tst.gain, gain)
+        self.assertEqual(gain, tst.gain)
 
     def test_req07_global_reset(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.on_init()
+        tst.init_run = False
         tst.gc = 100
         tst.gc_sts[0] = 10
         tst.gc_sts[1] = 20
@@ -359,15 +372,15 @@ class RequirementsVerification(unittest.TestCase):
         tst = Leistungsmesser_11083_11083(0)
         tst.debug_gain = 5
         tst.debug_offset = 2
-
         tst.on_init()
-
+        tst.init_run = False
         tst.on_input_value(tst.PIN_I_IC, 10)
         self.assertEqual(tst.gc, 48)
 
     def test_req10_overflow(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.on_init()
+        tst.init_run = False
         self.assertEqual(tst.gc, 0)
         self.assertEqual(tst.ic_prev, 0)
 
@@ -378,6 +391,21 @@ class RequirementsVerification(unittest.TestCase):
         tst.on_input_value(tst.PIN_I_IC, 5)
         self.assertEqual(tst.gc, 15)
         self.assertEqual(tst.ic_prev, 5)
+
+    def test_req11_1st_run(self):
+        tst = Leistungsmesser_11083_11083(0)
+        tst.on_init()
+        tst.init_run = True
+        self.assertEqual(tst.gc, 0, "a")
+        self.assertEqual(tst.ic_prev, 0, "b")
+
+        tst.on_input_value(tst.PIN_I_IC, 5000)
+        self.assertEqual(5000, tst.ic_prev, "c")
+        self.assertEqual(0, tst.gc, "d")
+
+        tst.on_input_value(tst.PIN_I_IC, 5005)
+        self.assertEqual(5, tst.gc, "e")
+        self.assertEqual(5005, tst.ic_prev, "f")
 
 
 if __name__ == '__main__':
