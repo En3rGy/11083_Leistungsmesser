@@ -80,7 +80,7 @@ Code and releases are availabe via [github](https://github.com/En3rGy/14108_tibb
 
 
 ## Requirements
-1. The module shall output the consumptions since the beginning for all current time spans.
+1. The module shall output the (increasing) consumptions for all current/active time spans.
 2. The module shall output the total consumptions of the previous time spans.
 3. The module shall use an increasing counter as input for calculating the consumptions.
 4. The module should use a pulse signal input for calculating the consumptions.
@@ -89,7 +89,8 @@ Code and releases are availabe via [github](https://github.com/En3rGy/14108_tibb
 7. The module shall accept an offset input value to be substracted from the gained counter input value.
 8. The module shall accept a "reset" input, setting all outputs and internal values to 0.
 9. The module shall output the global counter repsecting gain and offset since the last reset.
-10. The module shall deal with an overflow of the input counter by increasing the global counter.
+10. The module shall deal with an overflow of the input counter by continuing increasing the global counter.
+11. If running for the 1st time after setting the module on a logic page, the module shall use the 1st input counter signal as init value to calculate future consumptions.
 
 ## Software Design Description
 
