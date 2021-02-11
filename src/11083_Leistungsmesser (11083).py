@@ -41,12 +41,12 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 #### Own written code can be placed after this commentblock . Do not change or delete commentblock! ####
 ###################################################################################################!!!##
 
-    gc_sts = [0] * 3  # global counter at start of time span
-    cons_prev = [0] * 3  # consumption of previous time span
-    gc = 0  # global counter
-    ic_prev = 0  # Last input counter value received, respecting gain and offset
-    gain = 1
-    offset = 0
+    gc_sts = [0.0] * 3  # global counter at start of time span
+    cons_prev = [0.0] * 3  # consumption of previous time span
+    gc = 0.0  # global counter
+    ic_prev = 0.0  # Last input counter value received, respecting gain and offset
+    gain = 1.0
+    offset = 0.0
     precision = 6
     init_run = True
 
@@ -85,6 +85,34 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 
         self._set_remanent(rem_gc_sts, self.gc_sts[i])
         self._set_remanent(rem_cons_prev, self.cons_prev[i])
+
+    def reset(self):
+        self.gc = 0.0
+        self._set_remanent(self.REM_GC, self.gc)
+        self._set_output_value(self.PIN_O_GC, self.gc)
+
+        self.gc_sts[0] = 0.0
+        self._set_remanent(self.REM_TS1_GC_STS, 0)
+        self._set_remanent(self.REM_TS1_CONS_PREV, 0)
+        self._set_output_value(self.PIN_O_TS1_CONS_PEV, 0)
+        self._set_output_value(self.PIN_O_TS1_CONS_CURR, 0)
+
+        self.gc_sts[1] = 0.0
+        self._set_remanent(self.REM_TS2_GC_STS, 0)
+        self._set_output_value(self.PIN_O_TS2_CONS_PEV, 0)
+        self._set_output_value(self.PIN_O_TS1_CONS_CURR, 0)
+        self._set_remanent(self.REM_TS2_CONS_PREV, 0)
+
+        self.gc_sts[2] = 0.0
+        self._set_remanent(self.REM_TS3_GC_STS, 0)
+        self._set_output_value(self.PIN_O_TS3_CONS_PEV, 0)
+        self._set_output_value(self.PIN_O_TS1_CONS_CURR, 0)
+        self._set_remanent(self.REM_TS3_CONS_PREV, 0)
+
+        self.ic_prev = 0.0
+        self._set_remanent(self.REM_IC_PREV, self.ic_prev)
+
+        self.init_run = True
 
     def on_init(self):
         self.DEBUG = self.FRAMEWORK.create_debug_section()
@@ -166,19 +194,4 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
             self.process_int_reset(2)
 
         elif index == self.PIN_I_RESET and value != 0:
-            self.gc = 0
-            self._set_remanent(self.REM_GC, 0)
-
-            self.gc_sts[0] = 0
-            self._set_remanent(self.REM_TS1_GC_STS, 0)
-            self.gc_sts[1] = 0
-            self._set_remanent(self.REM_TS2_GC_STS, 0)
-            self.gc_sts[2] = 0
-            self._set_remanent(self.REM_TS3_GC_STS, 0)
-
-            self.ic_prev = 0
-            self._set_remanent(self.REM_IC_PREV, self.ic_prev)
-
-            self._set_remanent(self.REM_TS1_CONS_PREV, 0)
-            self._set_remanent(self.REM_TS2_CONS_PREV, 0)
-            self._set_remanent(self.REM_TS3_CONS_PREV, 0)
+            self.reset()
