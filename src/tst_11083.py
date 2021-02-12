@@ -153,21 +153,24 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
         self._set_output_value(self.PIN_O_GC, self.gc)
 
         self.gc_sts[0] = 0
+        self.cons_prev[0] = 0
         self._set_remanent(self.REM_TS1_GC_STS, 0)
         self._set_remanent(self.REM_TS1_CONS_PREV, 0)
         self._set_output_value(self.PIN_O_TS1_CONS_PEV, 0)
         self._set_output_value(self.PIN_O_TS1_CONS_CURR, 0)
 
         self.gc_sts[1] = 0
+        self.cons_prev[1] = 0
         self._set_remanent(self.REM_TS2_GC_STS, 0)
         self._set_output_value(self.PIN_O_TS2_CONS_PEV, 0)
-        self._set_output_value(self.PIN_O_TS1_CONS_CURR, 0)
+        self._set_output_value(self.PIN_O_TS2_CONS_CURR, 0)
         self._set_remanent(self.REM_TS2_CONS_PREV, 0)
 
         self.gc_sts[2] = 0
+        self.cons_prev[2] = 0
         self._set_remanent(self.REM_TS3_GC_STS, 0)
         self._set_output_value(self.PIN_O_TS3_CONS_PEV, 0)
-        self._set_output_value(self.PIN_O_TS1_CONS_CURR, 0)
+        self._set_output_value(self.PIN_O_TS3_CONS_CURR, 0)
         self._set_remanent(self.REM_TS3_CONS_PREV, 0)
 
         self.ic_prev = 0
