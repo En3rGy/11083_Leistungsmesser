@@ -52,8 +52,9 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 
     def process_counter(self):
         for i in range(3):
-            pin = self.PIN_O_TS1_CONS_CURR
-            if i == 1:
+            if i == 0:
+                pin = self.PIN_O_TS1_CONS_CURR
+            elif i == 1:
                 pin = self.PIN_O_TS2_CONS_CURR
             elif i == 2:
                 pin = self.PIN_O_TS3_CONS_CURR
@@ -147,10 +148,10 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
         self.gain = self._get_input_value(self.PIN_I_GAIN)
         self.offset = self._get_input_value(self.PIN_I_OFFSET)
 
+        self._set_output_value(self.PIN_O_TS1_CONS_PEV, self.cons_prev[0])
+        self._set_output_value(self.PIN_O_TS2_CONS_PEV, self.cons_prev[1])
+        self._set_output_value(self.PIN_O_TS3_CONS_PEV, self.cons_prev[2])
         self.process_counter()
-        self.process_int_reset(0)
-        self.process_int_reset(1)
-        self.process_int_reset(2)
 
     def on_input_value(self, index, value):
 
