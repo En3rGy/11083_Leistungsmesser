@@ -29,7 +29,6 @@
 				<remanent_variable const_name="ts1_cons_prev">ts1_cons_prev</remanent_variable>
 				<remanent_variable const_name="ts2_cons_prev">ts2_cons_prev</remanent_variable>
 				<remanent_variable const_name="ts3_cons_prev">ts3_cons_prev</remanent_variable>
-				<remanent_variable const_name="last_cnt_val">last_cnt_val</remanent_variable>
             </remanent_variables>
             <imports>
             </imports>		

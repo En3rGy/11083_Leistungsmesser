@@ -34,7 +34,6 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
         self.REM_TS1_CONS_PREV=6
         self.REM_TS2_CONS_PREV=7
         self.REM_TS3_CONS_PREV=8
-        self.REM_LAST_CNT_VAL=9
         self.FRAMEWORK._run_in_context_thread(self.on_init)
 
 ########################################################################################################

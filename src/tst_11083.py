@@ -98,7 +98,6 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
         self.REM_TS1_CONS_PREV=6
         self.REM_TS2_CONS_PREV=7
         self.REM_TS3_CONS_PREV=8
-        self.REM_LAST_CNT_VAL=9
         self.FRAMEWORK._run_in_context_thread(self.on_init)
 
     ########################################################################################################
@@ -348,26 +347,38 @@ class RequirementsVerification(unittest.TestCase):
         tst.on_init()
         tst.init_run = False
         tst.on_input_value(tst.PIN_I_IC, 10)
-        self.assertEqual(10, tst.gc)
-        self.assertEqual(0, tst.gc_sts[0])
+        tst.gc_sts[0] = 0
 
         tst.on_input_value(tst.PIN_I_RESET1, 1)
-        self.assertEqual(10, tst.gc)
-        self.assertEqual(10, tst.gc_sts[0])
+        self.assertEqual(10, tst.gc, 'a')
+        self.assertEqual(10, tst.gc_sts[0], 'b')
+        self.assertEqual(0, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_CURR], 'c')
+        self.assertEqual(10, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_PEV], 'd')
 
         tst.on_input_value(tst.PIN_I_IC, 20)
-        self.assertEqual(20, tst.gc)
-        self.assertEqual(0, tst.gc_sts[1])
+        self.assertEqual(20, tst.gc, 'e')
+        self.assertEqual(0, tst.gc_sts[1], 'f')
+        self.assertEqual(10, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_CURR], 'g')
+        self.assertEqual(10, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_PEV], 'h')
 
         tst.on_input_value(tst.PIN_I_RESET2, 1)
         tst.on_input_value(tst.PIN_I_IC, 30.1)
         tst.on_input_value(tst.PIN_I_RESET3, 1)
         tst.on_input_value(tst.PIN_I_IC, 40.2)
 
+        tst.on_input_value(tst.PIN_I_RESET1, 0)
+        tst.on_input_value(tst.PIN_I_RESET1, 1)
+
         self.assertEqual(10, tst.gc_sts[0])
         self.assertEqual(20, tst.gc_sts[1])
         self.assertEqual(30.1, tst.gc_sts[2])
         self.assertEqual(40.2, tst.gc)
+        self.assertEqual(30.2, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_CURR], 'i')
+        self.assertEqual(10, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_PEV], 'j')
+        self.assertEqual(20.2, tst.debug_set_output_value[tst.PIN_O_TS2_CONS_CURR], 'k')
+        self.assertEqual(20, tst.debug_set_output_value[tst.PIN_O_TS2_CONS_PEV], 'l')
+        self.assertEqual(10.1, tst.debug_set_output_value[tst.PIN_O_TS3_CONS_CURR], 'm')
+        self.assertEqual(30.1, tst.debug_set_output_value[tst.PIN_O_TS3_CONS_PEV], 'n')
 
     def test_req06_gain_input(self):
         tst = Leistungsmesser_11083_11083(0)
