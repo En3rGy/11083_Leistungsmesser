@@ -144,6 +144,7 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
 
         self.cons_prev[i] = round(self.gc - self.gc_sts[i], self.precision)
         self.gc_sts[i] = self.gc
+        self.DEBUG.set_value("gc_sts[" + str(i) + "]", self.gc_sts[i])
         self._set_output_value(pin_prev, self.cons_prev[i])
         self._set_output_value(pin_curr, 0)
 
@@ -180,6 +181,42 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
         self._set_remanent(self.REM_IC_PREV, self.ic_prev)
 
         self.init_run = True
+
+    def scale_ic(self, ic):
+        return (ic * self.gain) - self.offset
+
+    def calc_global_counter(self, ic):
+        self.DEBUG.set_value("ic", ic)
+
+        ic_curr = self.scale_ic(ic)
+
+        self.DEBUG.set_value("ic_curr", ic_curr)
+        self.DEBUG.set_value("ic_prev", self.ic_prev)
+
+        if self.init_run:
+            self.ic_prev = ic_curr
+            self.init_run = False
+            return True
+
+        # increase global counter
+        # pulse
+        if ic == 1:
+            self.gc += ic_curr
+        # no update
+        elif ic_curr == self.ic_prev:
+            return False
+        # overflow
+        elif self.ic_prev > ic_curr:
+            self.gc += ic_curr
+        # usual counter
+        else:
+            self.gc += ic_curr - self.ic_prev
+
+        self.ic_prev = ic_curr
+        self._set_remanent(self.REM_IC_PREV, self.ic_prev)
+        self.DEBUG.set_value("gc", self.gc)
+
+        return True
 
     def on_init(self):
         self.DEBUG = self.FRAMEWORK.create_debug_section()
@@ -219,35 +256,19 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
     def on_input_value(self, index, value):
 
         if index == self.PIN_I_IC:
-            ic_curr = (value * self.gain) - self.offset
+            ret = self.calc_global_counter(value)
 
-            if self.init_run:
-                self.ic_prev = ic_curr
-                self.init_run = False
-                return
+            if ret:
+                # process counter for intervals & store data
+                self.process_counter()
 
-            # increase global counter
-            # pulse
-            if value == 1:
-                self.gc += ic_curr
-            # overflow
-            elif self.ic_prev > ic_curr:
-                self.gc += ic_curr
-            # usual counter
-            else:
-                self.gc += ic_curr - self.ic_prev
-
-            # process counter for intervals & store data
-            self.process_counter()
-
-            # store global counter
-            self.ic_prev = ic_curr
-            self._set_output_value(self.PIN_O_GC, self.gc)
-            self._set_remanent(self.REM_GC, self.gc)
-            self._set_remanent(self.REM_IC_PREV, self.ic_prev)
+                # store global counter
+                self._set_output_value(self.PIN_O_GC, self.gc)
+                self._set_remanent(self.REM_GC, self.gc)
 
         elif index == self.PIN_I_GAIN:
             self.gain = value
+
         elif index == self.PIN_I_OFFSET:
             self.offset = value
 
@@ -367,7 +388,6 @@ class RequirementsVerification(unittest.TestCase):
         tst.on_input_value(tst.PIN_I_IC, 40.2)
 
         tst.on_input_value(tst.PIN_I_RESET1, 0)
-        tst.on_input_value(tst.PIN_I_RESET1, 1)
 
         self.assertEqual(10, tst.gc_sts[0])
         self.assertEqual(20, tst.gc_sts[1])
@@ -453,6 +473,13 @@ class FunctionalTests(unittest.TestCase):
     def setUp(self):
         pass
 
+    def test_scale(self):
+        tst = Leistungsmesser_11083_11083(0)
+        tst.gain = 1000.0
+        tst.offset = 10
+        res = tst.scale_ic(1)
+        self.assertEqual(990, res)
+
     def test_reboot(self):
         tst = Leistungsmesser_11083_11083(0)
         tst.reset()
@@ -469,6 +496,23 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(5000, tst.ic_prev, "tst.ic_prev")
         self.assertEqual(1000, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_PEV])
         self.assertEqual(7500.0, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_CURR])
+
+    def test_ic_no_change(self):
+        tst = Leistungsmesser_11083_11083(0)
+        tst.on_init()
+        tst.gc = 5000.0
+        tst.gc_sts[0] = 2000.0
+        tst.ic_prev = 4000.0
+
+        tst.on_input_value(tst.PIN_I_IC, 5000.0)  # --> gc = 6000 because of ic increase by 1000
+
+        self.assertEqual(5000, tst.ic_prev, "a")
+        self.assertEqual(4000.0, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_CURR], "b")
+
+        tst.on_input_value(tst.PIN_I_IC, 5000.0)
+
+        self.assertEqual(5000, tst.ic_prev, "c")
+        self.assertEqual(4000.0, tst.debug_set_output_value[tst.PIN_O_TS1_CONS_CURR], "d")
 
 if __name__ == '__main__':
     unittest.main()
