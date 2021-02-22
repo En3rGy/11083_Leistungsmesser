@@ -43,6 +43,7 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
     gc_sts = [0] * 3  # global counter at start of time span
     cons_prev = [0] * 3  # consumption of previous time span
     gc = 0  # global counter
+    ic_curr = 0
     ic_prev = 0  # Last input counter value received, respecting gain and offset
     gain = 1
     offset = 0
@@ -113,6 +114,7 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
         self._set_output_value(self.PIN_O_TS3_CONS_CURR, 0)
         self._set_remanent(self.REM_TS3_CONS_PREV, 0)
 
+        self.ic_curr = 0
         self.ic_prev = 0
         self._set_remanent(self.REM_IC_PREV, self.ic_prev)
 
@@ -124,32 +126,31 @@ class Leistungsmesser_11083_11083(hsl20_3.BaseModule):
     def calc_global_counter(self, ic):
         self.DEBUG.set_value("ic", ic)
 
-        ic_curr = self.scale_ic(ic)
+        self.ic_prev = self.ic_curr
+        self.ic_curr = self.scale_ic(ic)
 
-        self.DEBUG.set_value("ic_curr", ic_curr)
+        self.DEBUG.set_value("ic_curr", self.ic_curr)
         self.DEBUG.set_value("ic_prev", self.ic_prev)
+        self._set_remanent(self.REM_IC_PREV, self.ic_prev)
 
         if self.init_run:
-            self.ic_prev = ic_curr
             self.init_run = False
             return True
 
         # increase global counter
         # pulse
         if ic == 1:
-            self.gc += ic_curr
+            self.gc += self.ic_curr
         # no update
-        elif ic_curr == self.ic_prev:
+        elif self.ic_curr == self.ic_prev:
             return False
         # overflow
-        elif self.ic_prev > ic_curr:
-            self.gc += ic_curr
+        elif self.ic_prev > self.ic_curr:
+            self.gc += self.ic_curr
         # usual counter
         else:
-            self.gc += ic_curr - self.ic_prev
+            self.gc += self.ic_curr - self.ic_prev
 
-        self.ic_prev = ic_curr
-        self._set_remanent(self.REM_IC_PREV, self.ic_prev)
         self.DEBUG.set_value("gc", self.gc)
 
         return True

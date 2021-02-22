@@ -53,6 +53,8 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
 ### Change Log
 
+ - v0.9
+     - Improvement: Debugging messages
  - v0.8
      - Refactoring to HSL2
 
