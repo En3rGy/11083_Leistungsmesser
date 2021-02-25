@@ -55,6 +55,7 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
  - v0.9
      - Improvement: Debugging messages
+	 - Fix: Ignoring 0 counter values
  - v0.8
      - Refactoring to HSL2
 
