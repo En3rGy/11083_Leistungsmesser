@@ -12,35 +12,35 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
 ## Inputs
 
-| No. | Name | Initialisation | Description |
-| --- | --- | --- | --- |
-| 1 | Counter | 0 | Current counter value, either increasing or as puls. <br> If given as pulse, gain is used to define the step size. A puls signal has to be equal to 1! |
-| 2 | Reset 1 | 0 | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous. |
-| 3 | Reset 2 | 0 | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous. |
-| 4 | Reset 3 | 0 | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous. |
-| 5 | Gain | 0 | All calculations are performed on `Counter = (Counter * Gain) - Offset`  |
-| 6 | Reset | 0 | Resets all counters and retentive data. |
-| 7 | Offset | 0 | All calculations are performed on `Counter = (Counter * Gain) - Offset` |
+| No. | Name    | Initialisation | Description                                                                                                                                            |
+|-----|---------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1   | Counter | 0              | Current counter value, either increasing or as puls. <br> If given as pulse, gain is used to define the step size. A puls signal has to be equal to 1! |
+| 2   | Reset 1 | 0              | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous.                                                   |
+| 3   | Reset 2 | 0              | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous.                                                   |
+| 4   | Reset 3 | 0              | Resets counter of interval 1 when receiving 1. Setting the current interval counter as new previous.                                                   |
+| 5   | Gain    | 0              | All calculations are performed on `Counter = (Counter * Gain) - Offset`                                                                                |
+| 6   | Reset   | 0              | Resets all counters and retentive data.                                                                                                                |
+| 7   | Offset  | 0              | All calculations are performed on `Counter = (Counter * Gain) - Offset`                                                                                |
 
 ## Outputs
 
-| No. | Name | Initialisation | Description |
-| --- | --- | --- | --- |
-| 1 | Current 1 | 0 | Consumption within current interval 1 |
-| 2 | Previous 1 | 0 | Consumption during previous interval 1 |
-| 3 | Current 2 | 0 | Consumption within current interval 2 |
-| 4 | Previous 2 | 0 | Consumption during previous interval 2 |
-| 5 | Current 3 | 0 | Consumption within current interval 3 |
-| 6 | Previous 3 | 0 | Consumption during previous interval 3 |
-| 7 | Counter total | 0 | Total continuous counter |
+| No. | Name          | Initialisation | Description                            |
+|-----|---------------|----------------|----------------------------------------|
+| 1   | Current 1     | 0              | Consumption within current interval 1  |
+| 2   | Previous 1    | 0              | Consumption during previous interval 1 |
+| 3   | Current 2     | 0              | Consumption within current interval 2  |
+| 4   | Previous 2    | 0              | Consumption during previous interval 2 |
+| 5   | Current 3     | 0              | Consumption within current interval 3  |
+| 6   | Previous 3    | 0              | Consumption during previous interval 3 |
+| 7   | Counter total | 0              | Total continuous counter               |
 
 ## Sample Values
 
-| Input | Output |
-| --- | --- |
-| On init | All outputs set to the previously stored retentive values |
-| Counter = A | Output `Current x` set to `A - Previous x` with x = 1/2/3 |
-| Counter = B | Output `Current x` set to `B - Previous x` with x = 1/2/3 |
+| Input       | Output                                                         |
+|-------------|----------------------------------------------------------------|
+| On init     | All outputs set to the previously stored retentive values      |
+| Counter = A | Output `Current x` set to `A - Previous x` with x = 1/2/3      |
+| Counter = B | Output `Current x` set to `B - Previous x` with x = 1/2/3      |
 | Reset 1 = 1 | Output `Previous 1 = Current 1` and afterwards `Current 1 = 0` | 
 
 
@@ -53,11 +53,13 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 
 ### Change Log
 
- - v0.9
+- V0.11: Improvement: Refactoring
+- V0.10 
+- v0.9
      - Improvement: Debugging messages
-	 - Fix: Ignoring 0 counter values
- - v0.8
-     - Refactoring to HSL2
+     - Fix: Ignoring 0 counter values
+- v0.8
+    - Refactoring to HSL2
 
 
 ### Open Issues / Know Bugs
@@ -99,29 +101,29 @@ Code and releases are available via [github](https://github.com/En3rGy/14108_tib
 
 ### Definitions
 
-| Abbrev. | Description |
-| --- | --- | 
-| `ts` | Time span |
-| `sts` | Start of time span |
-| `ic` | Input counter value |
-| `ic_curr` | Current input counter value received, respecting gain and offset. |
-| `ic_prev` | Last input counter value received, respecting gain and offset. |
-| `gc` | Global counter containing the counter value (incl. gain & offset) since the last reset. |
-| `ts1_gc_sts` | Global value of counter at the beginning of the *current* time span 1 *and* at the end of the *previous* time span 1. |
-| `ts1_cons_curr` | Consumption of the current time span 1, increasing with new ic. |
-| `ts1_cons_pev` | Total consumption during the previous time span 1. |
+ | Abbrev.         | Description                                                                                                           |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------|
+ | `ts`            | Time span                                                                                                             |
+ | `sts`           | Start of time span                                                                                                    |
+ | `ic`            | Input counter value                                                                                                   |
+ | `ic_curr`       | Current input counter value received, respecting gain and offset.                                                     |
+ | `ic_prev`       | Last input counter value received, respecting gain and offset.                                                        |
+ | `gc`            | Global counter containing the counter value (incl. gain & offset) since the last reset.                               |
+ | `ts1_gc_sts`    | Global value of counter at the beginning of the *current* time span 1 *and* at the end of the *previous* time span 1. |
+ | `ts1_cons_curr` | Consumption of the current time span 1, increasing with new ic.                                                       |
+ | `ts1_cons_pev`  | Total consumption during the previous time span 1.                                                                    |
 
 ### Solution Outline
 
-Calculations are based on an global counter. This counter is first initialised by the first in value received. The global counter is increased by the delta of two ic values received. To calculate the consumption during a time span, the value of the global counter at the beginning of the time span is stored. This value equals the value of the global counter at the end of the previous time span. Consumptions are calculated by subtracting the global counter values stored.
+Calculations are based on a global counter. This counter is first initialised by the first in value received. The global counter is increased by the delta of two ic values received. To calculate the consumption during a time span, the value of the global counter at the beginning of the time span is stored. This value equals the value of the global counter at the end of the previous time span. Consumptions are calculated by subtracting the global counter values stored.
 
 ### Calculations
-| Description | Formula |
-| --- | --- |
-| Input counter respecting input counter (ic) gain (k) and offset (o) | `ic_curr = k * ic - o` |
-| Receive new ic_curr value and deal with ic buffer overrun | `ic_prev > ic_curr ? gc += ic_curr : gc += ic_curr - ic_prev` <br> `ic_prev = ic_curr` |
-| Local counter during for the on-going time span 1 | `ts1_cons_curr = gc - ts1_gc_sts` |
-| Receive end / start interval trigger | `ts1_cons_prev = gc - ts1_gc_sts` <br> `ts1_gc_sts = gc` <br> `ts1_cons_curr = 0`|
+| Description                                                         | Formula                                                                                |
+|---------------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| Input counter respecting input counter (ic) gain (k) and offset (o) | `ic_curr = k * ic - o`                                                                 |
+| Receive new ic_curr value and deal with ic buffer overrun           | `ic_prev > ic_curr ? gc += ic_curr : gc += ic_curr - ic_prev` <br> `ic_prev = ic_curr` |
+| Local counter during for the on-going time span 1                   | `ts1_cons_curr = gc - ts1_gc_sts`                                                      |
+| Receive end / start interval trigger                                | `ts1_cons_prev = gc - ts1_gc_sts` <br> `ts1_gc_sts = gc` <br> `ts1_cons_curr = 0`      |
 
 ## Validation & Verification
 - Unit tests are performed for each requirement.
