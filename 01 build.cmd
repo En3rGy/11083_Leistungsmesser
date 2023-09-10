@@ -1,25 +1,32 @@
 @echo off
+
+set PROJ_DIR=11083_Leistungsmesser
+set MAN_FILE_NAME=log11083.html
+set TITLE=Leistungsmesser (11083)
+
 set path=%path%;C:\Python27\
 set PYTHONPATH=C:\Python27;C:\Python27\Lib
 
-echo ^<head^> > .\release\log11083.html
-echo ^<link rel="stylesheet" href="style.css"^> >> .\release\log11083.html
-echo ^<title^>Logik - Leistungsmesser (11083)^</title^> >> .\release\log11083.html
-echo ^<style^> >> .\release\log11083.html
-echo body { background: none; } >> .\release\log11083.html
-echo ^</style^> >> .\release\log11083.html
-echo ^<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"^> >> .\release\log11083.html
-echo ^</head^> >> .\release\log11083.html
+echo Generating Manual Page
+echo ^<head^> > .\release\%MAN_FILE_NAME%
+echo ^<link rel="stylesheet" href="style.css"^> >> .\release\%MAN_FILE_NAME%
+echo ^<title^>Logik - %TITLE%^</title^> >> .\release\%MAN_FILE_NAME%
+echo ^<style^> >> .\release\%MAN_FILE_NAME%
+echo body { background: none; } >> .\release\%MAN_FILE_NAME%
+echo ^</style^> >> .\release\%MAN_FILE_NAME%
+echo ^<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"^> >> .\release\%MAN_FILE_NAME%
+echo ^</head^> >> .\release\%MAN_FILE_NAME%
 
-@echo on
+type .\README.md | C:\Python27\python -m markdown -x tables >> .\release\%MAN_FILE_NAME%
 
-type .\README.md | C:\Python27\python -m markdown -x tables >> .\release\log11083.html
-
-
+echo Generating HSL-MOdule
 cd ..\..
-C:\Python27\python generator.pyc "11083_Leistungsmesser" UTF-8
+echo on
+C:\Python27\python generator.pyc "%PROJ_DIR%" UTF-8
+echo off
 
-xcopy .\projects\11083_Leistungsmesser\src .\projects\11083_Leistungsmesser\release
+echo Putting everything together
+xcopy .\projects\%PROJ_DIR%\src .\projects\%PROJ_DIR%\release
 
 @echo Done.
 

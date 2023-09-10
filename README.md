@@ -49,7 +49,7 @@ All calculations are performed on `Counter = (Counter * Gain) - Offset`.
 - Recalculation during start: no
 - Module is retentive: yes
 - Internal designation: 11083
-- Category: Zähler
+- Category: Meter
 
 ### Change Log
 
@@ -88,14 +88,14 @@ Code and releases are available via [github](https://github.com/En3rGy/14108_tib
 1. The module shall output the (increasing) consumptions for all current/active time spans.
 2. The module shall output the total consumptions of the previous time spans.
 3. The module shall use an increasing counter as input for calculating the consumptions.
-4. The module should use a pulse signal input for calculating the consumptions.
+4. ~~The module should use a pulse signal input for calculating the consumptions.~~
 5. The start / end of a time span shall be indicated by a 1 on a dedicated input.
 6. The module shall accept a gain input to be multiplied with the counter input value.
 7. The module shall accept an offset input value to be subtracted from the gained counter input value.
 8. The module shall accept a "reset" input, setting all outputs and internal values to 0.
 9. The module shall output the global counter respecting gain and offset since the last reset.
 10. The module shall deal with an overflow of the input counter by continuing increasing the global counter.
-11. If running for the 1st time after setting the module on a logic page, the module shall use the 1st input counter signal as init value to calculate future consumptions.
+11. ~~If running for the 1st time after setting the module on a logic page, the module shall use the 1st input counter signal as init value to calculate future consumptions.~~
 
 ## Software Design Description
 
@@ -130,7 +130,7 @@ Calculations are based on a global counter. This counter is first initialised by
 
 ## Licence
 
-Copyright 2021 T. Paul
+Copyright 2023 T. Paul
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

@@ -123,8 +123,26 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(40, self.tst.debug_output_value[self.tst.PIN_O_GC])
         self.assertEqual(20, self.tst.debug_output_value[self.tst.PIN_O_TS1_CONS_PEV])
         self.assertEqual(20, self.tst.debug_output_value[self.tst.PIN_O_TS1_CONS_CURR])
-
         print("Leaving test_hs_reboot()")
+
+    def test_reset(self):
+        print("Entering test_hs_reboot()")
+        self.tst.on_init()
+        self.tst.on_input_value(self.tst.PIN_I_IC, 0)
+        self.tst.on_input_value(self.tst.PIN_I_IC, 10)
+        self.tst.on_input_value(self.tst.PIN_I_IC, 20)
+        self.tst.on_input_value(self.tst.PIN_I_RESET1, True)
+        self.tst.on_input_value(self.tst.PIN_I_IC, 30)
+        self.assertEqual(30, self.tst.debug_output_value[self.tst.PIN_O_GC])
+        self.assertEqual(20, self.tst.debug_output_value[self.tst.PIN_O_TS1_CONS_PEV])
+        self.assertEqual(10, self.tst.debug_output_value[self.tst.PIN_O_TS1_CONS_CURR])
+        self.tst.on_input_value(self.tst.PIN_I_RESET2, True)
+        self.tst.on_input_value(self.tst.PIN_I_IC, 40)
+        self.assertEqual(40, self.tst.debug_output_value[self.tst.PIN_O_GC])
+        self.assertEqual(20, self.tst.debug_output_value[self.tst.PIN_O_TS1_CONS_PEV])
+        self.assertEqual(20, self.tst.debug_output_value[self.tst.PIN_O_TS1_CONS_CURR])
+        self.assertEqual(30, self.tst.debug_output_value[self.tst.PIN_O_TS2_CONS_PEV])
+        self.assertEqual(10, self.tst.debug_output_value[self.tst.PIN_O_TS2_CONS_CURR])
 
     def test_overflow(self):
         print("Entering test_overflow()")
@@ -138,7 +156,20 @@ class FunctionalTests(unittest.TestCase):
         self.tst.on_input_value(self.tst.PIN_I_IC, 20)
         self.assertEqual(40, self.tst.debug_output_value[self.tst.PIN_O_TS1_CONS_CURR])
         print("Leaving test_overflow()")
-    # todo overflow
+
+# 1. The module shall output the (increasing) consumptions for all current/active time spans.
+# 2. The module shall output the total consumptions of the previous time spans.
+# 3. The module shall use an increasing counter as input for calculating the consumptions.
+# 4. The module should use a pulse signal input for calculating the consumptions.
+# 5. The start / end of a time span shall be indicated by a 1 on a dedicated input.
+# 6. The module shall accept a gain input to be multiplied with the counter input value.
+# 7. The module shall accept an offset input value to be subtracted from the gained counter input value.
+# 8. The module shall accept a "reset" input, setting all outputs and internal values to 0.
+# 9. The module shall output the global counter respecting gain and offset since the last reset.
+# 10. The module shall deal with an overflow of the input counter by continuing increasing the global counter.
+# 11. If running for the 1st time after setting the module on a logic page, the module shall use the 1st input counter signal as init value to calculate future consumptions.
+
+
 
 
 if __name__ == '__main__':
